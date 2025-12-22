@@ -1,0 +1,55 @@
+Instructions
+
+# Download movie in mp4 format
+# m4v is the same as mp4, just change the suffix
+
+# Strip frames out of mp4
+ffmpeg -i jp.mp4 -r 1 %04d.png
+
+# Renumber and rename files after removing any unwanted frames, if necessary
+i=0
+for orig_filename in *.png
+do
+      	    ((i+=1))
+            new_number=$(printf "%04.0f" $i)
+            mv "$orig_filename" "seq-$new_number.png"
+done
+
+# Convert to grayscale
+for j in *.png
+    do
+	echo "$j"
+	magick convert "$j" -set colorspace Gray -separate -average "$j"
+done
+
+# Change brightness and contrast (test values first)
+for j in *.png
+    do
+	echo "$j"
+	magick convert -brightness-contrast 5x25 "$j" "$j"
+done
+
+# Crop so ratio is 800/480 = 1.666
+for j in *.png
+    do
+    	magick convert "$j" -gravity center -crop 800:480 "$j"
+done
+
+# After removing unwanted frames manually, 
+
+
+# Renumber after removing frames, if necessary
+i = 1
+for j in *.png
+	do
+		new_basename = $(printf "%04" "i")
+		mv "$j" "$basename.png"
+done
+
+# Github commands
+
+git clone https://github.com/mister-midpines/jp
+git add any new/updated files
+git commit # This will open vim to add notes. Type esc :w :q to save and exit
+git push
+git push -f origin main
