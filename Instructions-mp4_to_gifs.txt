@@ -1,10 +1,23 @@
 Instructions
 
 # Download movie in mp4 format
-# m4v is the same as mp4, just change the suffix
+# m4v is the same as mp4, just change the extension
+
+# Github commands
+#
+# git clone https://github.com/mister-midpines/jp
+# git add any new/updated files
+# git commit # This will open vim to add notes. Type esc :w :q to save and exit
+# git push
+# git push -f origin main
+
+mkdir orig_frames gray_frames contrast_frames cropped_frames
+
 
 # Strip frames out of mp4
-ffmpeg -i jp.mp4 -r 1 %04d.png
+ffmpeg -i ____.mp4 -r 1 %04d.png
+wait
+
 
 # Renumber and rename files after removing any unwanted frames, if necessary
 i=0
@@ -14,6 +27,28 @@ do
             new_number=$(printf "%04.0f" $i)
             mv "$orig_filename" "seq-$new_number.png"
 done
+wait
+
+cp *.png orig_frames
+wait
+
+
+# Crop so ratio is 800/480 = 1.666
+for j in *.png
+    do
+    	magick convert "$j" -gravity center -crop 800:480 "$j"
+done
+wait
+
+# Rescale so height is 480 (which will make width 800)
+for j in *.png
+    do
+	echo "$j"
+	magick convert -resize x480 "$j" "$j"
+done
+
+cp *.png cropped_frames
+wait
 
 # Convert to grayscale
 for j in *.png
@@ -21,6 +56,10 @@ for j in *.png
 	echo "$j"
 	magick convert "$j" -set colorspace Gray -separate -average "$j"
 done
+wait
+
+cp *.png gray_frames
+wait
 
 # Change brightness and contrast (test values first)
 for j in *.png
@@ -28,28 +67,10 @@ for j in *.png
 	echo "$j"
 	magick convert -brightness-contrast 5x25 "$j" "$j"
 done
+wait
 
-# Crop so ratio is 800/480 = 1.666
-for j in *.png
-    do
-    	magick convert "$j" -gravity center -crop 800:480 "$j"
-done
+# Make an image list
+ls -1 *.png > image_list
 
-# After removing unwanted frames manually, 
-
-
-# Renumber after removing frames, if necessary
-i = 1
-for j in *.png
-	do
-		new_basename = $(printf "%04" "i")
-		mv "$j" "$basename.png"
-done
-
-# Github commands
-
-git clone https://github.com/mister-midpines/jp
-git add any new/updated files
-git commit # This will open vim to add notes. Type esc :w :q to save and exit
-git push
-git push -f origin main
+cp *.png contrast_frames
+wait
